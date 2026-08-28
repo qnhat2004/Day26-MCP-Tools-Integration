@@ -1,0 +1,7 @@
+# Taste
+
+- Communicates in Vietnamese and expects the assistant to respond in Vietnamese. Confidence: 0.8
+- Prefers the assistant to take the task and complete it end-to-end autonomously (e.g. "hoàn thành bài lab cho tôi đi") rather than stopping to ask questions or seek confirmation mid-task. Also drops inputs (e.g. a bare API key with no explanation) and expects the assistant to figure out the next steps, wire things in, test, and finish on its own. Confidence: 0.9
+- When given a lab rubric/checklist with per-item pass criteria (e.g. "hoàn thành hết các yêu cầu chưa" + a 3-level checklist), expects every item to be verified with actual test runs and reported with a per-item status (✓/⚠️) at the end, including explicit notes on what the user must do themselves (real API keys, API budget limits). Quality bars from the rubric are treated as requirements: tools must solve real tasks with dynamic data (not meaningless hardcoded values), secrets must never be committed, backward compatibility must be preserved. Confidence: 0.75
+- Environment: the user's Windows machine runs a squid proxy that intercepts requests to `localhost` (returns 504), so local servers/clients must use `127.0.0.1` instead (MCP server URLs, auth client URLs, registry configs); servers should bind `0.0.0.0` to allow LAN access. Confidence: 0.9
+- Environment/workflow: Python scripts printing Vietnamese to the console on this Windows machine fail with UnicodeEncodeError (cp1252) or get swallowed output; run with `-X utf8` or write results to a file. Confidence: 0.8

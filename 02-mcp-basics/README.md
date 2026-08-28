@@ -19,11 +19,14 @@ pip install -r ../requirements.txt
 python weather_client.py     # client tự khởi động weather_server.py
 ```
 
+> **Lưu ý Windows**: nếu gặp lỗi `UnicodeEncodeError` khi in tiếng Việt, chạy với `python -X utf8 weather_client.py`.
+
 Kết quả mong đợi:
 
 ```
 Tools server cung cấp:
   - get_weather: Lấy thời tiết hiện tại của một thành phố.
+  - search_logs: Tìm các dòng log gần nhất chứa keyword (mặc định: lỗi).
 
 call_tool get_weather(city='Hanoi'):
   -> Hanoi: 29°C, trời mưa
@@ -41,6 +44,14 @@ call_tool get_weather(city='Haiphong'):
 |---|---|
 | `weather_server.py` | MCP server — `@mcp.tool()` tự sinh schema từ type hints + docstring |
 | `weather_client.py` | MCP client — `list_tools` + `call_tool` qua stdio transport |
+| `app.log` | File log (tự tạo lần đầu) — dữ liệu cho tool `search_logs` |
+
+## Tools
+
+| Tool | Mô tả | Ví dụ câu hỏi |
+|---|---|---|
+| `get_weather(city)` | Thời tiết hiện tại của một thành phố | "Thời tiết Hà Nội thế nào?" |
+| `search_logs(keyword, limit)` | Tìm dòng log gần nhất chứa keyword — dữ liệu động từ `app.log` | "Tìm 5 lỗi gần nhất trong log" |
 
 ---
 
@@ -238,7 +249,16 @@ Ví dụ trên chỉ demo **lớp giao thức** (không cần API key). Trong pr
 **Claude Code** (làm 1 lần, dùng mãi):
 
 ```bash
-claude mcp add weather -- python /đường/dẫn/tới/weather_server.py
+# Đường dẫn có dấu cách → phải quote từng phần (Windows: dùng .venv\Scripts\python.exe)
+claude mcp add --scope local weather -- "python.exe hoặc đường dẫn tuyệt đối" "D:\path\to\weather_server.py"
+
+# Kiểm tra server đã kết nối chưa
+claude mcp list          # weather: ✔ Connected
+claude mcp get weather
+
+# Restart Claude Code rồi hỏi bằng câu tự nhiên (không nói tên tool):
+#   "Thời tiết Hà Nội thế nào?"
+#   "Tìm 5 lỗi gần nhất trong log"
 ```
 
 **Gemini CLI**:

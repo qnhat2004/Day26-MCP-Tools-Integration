@@ -7,7 +7,7 @@ A weather agent built with Google ADK that connects to an MCP server via Streama
 ```
 ┌─────────────────┐   Streamable HTTP    ┌─────────────────┐      REST       ┌─────────────────┐
 │   ADK Agent     │ ──────────────────── │   MCP Server    │ ─────────────── │  WeatherAPI.com │
-│  (mcp-client)   │   localhost:8085/mcp │  (mcp-server)   │                 │                 │
+│  (mcp-client)   │   127.0.0.1:8085/mcp │  (mcp-server)   │                 │                 │
 └─────────────────┘                      └─────────────────┘                 └─────────────────┘
 ```
 
@@ -26,14 +26,14 @@ ADK (Agent Development Kit) đóng vai trò **MCP Client**
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                 │
 │  1. KẾT NỐI tới MCP Server qua Streamable HTTP                  │
-│     StreamableHTTPConnectionParams(url="localhost:8085/mcp")    │
+│     StreamableHTTPConnectionParams(url="127.0.0.1:8085/mcp")    │
 │                                                                 │
 │  2. KHÁM PHÁ tools tự động (list_tools)                         │
 │     McpToolset → tự hỏi server "anh có tool gì?"                │
 │     → nhận về: get_current_weather, get_forecast, health_check  │
 │                                                                 │
 │  3. TRUYỀN tools cho LLM (Gemini)                               │
-│     Agent(model="gemini-2.5-flash", tools=[weather_tools])      │
+│     Agent(model="gemini-3.6-flash", tools=[weather_tools])      │
 │     → Gemini biết nó có thể gọi 3 tools trên                    │
 │                                                                 │
 │  4. ĐIỀU PHỐI vòng lặp Function Calling                         │
@@ -63,7 +63,9 @@ export WEATHERAPI_KEY="your_weatherapi_key"
 uv run python weather.py
 ```
 
-The server will be available at `http://localhost:8085/mcp`.
+The server will be available at `http://127.0.0.1:8085/mcp`.
+
+> **Lưu ý**: dùng `127.0.0.1` thay vì `localhost` trong `MCP_SERVER_URL` (agent.py). Trên một số máy có proxy hệ thống (ví dụ squid), `localhost` có thể bị chặn và gây lỗi 504 khi MCP client kết nối, trong khi `127.0.0.1` luôn đi thẳng tới server local.
 
 ### 2. ADK Agent (Client)
 

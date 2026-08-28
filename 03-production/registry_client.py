@@ -82,9 +82,29 @@ class ToolRegistry:
 
 
 async def connect_and_call(match: dict, tool_args: dict) -> str:
-    """Kết nối tới server phù hợp và gọi tool đã tìm được."""
+    """Kết nối tới server phù hợp, đọc metadata trước, rồi gọi tool.
+
+    Client thông minh đọc resource `server://info` (nếu server công bố) để
+    kiểm tra version + deprecation TRƯỚC KHI gọi tool — đúng yêu cầu bài Khó.
+    """
     server = match["server"]
     tool_name = match["tool"]
+
+    async def _run(session: ClientSession) -> str:
+        # 1. Đọc metadata server (nếu có resource server://info)
+        try:
+            info = await session.read_resource("server://info")
+            meta = json.loads(info.contents[0].text)
+            print(f"   [metadata] server={meta.get('name')} v{meta.get('version')}")
+            deprecated = meta.get("deprecated_tools", [])
+            if tool_name in deprecated:
+                print(f"   [cảnh báo] tool '{tool_name}' đang deprecated!")
+        except Exception:
+            print("   [metadata] server không công bố server://info")
+
+        # 2. Gọi tool
+        result = await session.call_tool(tool_name, tool_args)
+        return result.content[0].text
 
     if server.get("transport") == "stdio":
         params = StdioServerParameters(
@@ -94,8 +114,7 @@ async def connect_and_call(match: dict, tool_args: dict) -> str:
         async with stdio_client(params) as (read, write):
             async with ClientSession(read, write) as session:
                 await session.initialize()
-                result = await session.call_tool(tool_name, tool_args)
-                return result.content[0].text
+                return await _run(session)
 
     elif server.get("transport") == "streamable-http":
         headers = {}
@@ -110,8 +129,7 @@ async def connect_and_call(match: dict, tool_args: dict) -> str:
             ):
                 async with ClientSession(read, write) as session:
                     await session.initialize()
-                    result = await session.call_tool(tool_name, tool_args)
-                    return result.content[0].text
+                    return await _run(session)
 
     raise ValueError(f"Transport không được hỗ trợ: {server.get('transport')}")
 

@@ -18,7 +18,7 @@ import httpx
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
-SERVER_URL = "http://localhost:8000/mcp"
+SERVER_URL = "http://127.0.0.1:8000/mcp"
 TOKEN = "dev-token-abc123"
 
 

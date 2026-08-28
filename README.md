@@ -35,6 +35,7 @@ pip install -r requirements.txt
 
 # MCP demo (không cần API key)
 cd 02-mcp-basics && python weather_client.py
+# Lưu ý Windows: dùng `python -X utf8 weather_client.py` nếu lỗi UnicodeEncodeError
 
 # Function Calling (cần Gemini API key)
 export GEMINI_API_KEY=...
@@ -47,6 +48,35 @@ python auth_client.py              # terminal 2
 
 # Production — Tool Registry
 cd 03-production && python registry_client.py
+
+# Production — Versioning
+cd 03-production && python versioned_client.py
+```
+
+## Tự kiểm tra nhanh (checklist 3 bài)
+
+**Bài Dễ (MCP cơ bản + tích hợp Claude Code):**
+```bash
+cd 02-mcp-basics && python weather_client.py      # server khởi động + list_tools + call_tool
+claude mcp add --scope local weather -- "<python>" "<abs path>/02-mcp-basics/weather_server.py"
+claude mcp list                                   # phải hiện ✔ Connected
+```
+Rồi hỏi Claude Code bằng câu tự nhiên: *"Thời tiết Hà Nội thế nào?"* hoặc *"Tìm 5 lỗi gần nhất trong log"* — agent phải TỰ quyết định gọi tool.
+
+**Bài Trung bình (Streamable HTTP + Auth):**
+```bash
+cd 03-production
+python auth_server.py     # terminal 1 → http://127.0.0.1:8000/mcp
+python auth_client.py     # terminal 2 → token hợp lệ gọi được
+# Test thủ công: POST /mcp không token → 401, token sai → 401, token đúng → 200
+# Truy cập từ máy khác trong LAN: http://<IP-LAN>:8000/mcp (server bind 0.0.0.0)
+```
+
+**Bài Khó (Versioning + server://info):**
+```bash
+cd 03-production
+python versioned_client.py    # đọc server://info → gọi v1 (vẫn chạy) + v2 (tính năng mới)
+python registry_client.py     # registry chọn best match + đọc metadata trước khi gọi
 ```
 
 ---

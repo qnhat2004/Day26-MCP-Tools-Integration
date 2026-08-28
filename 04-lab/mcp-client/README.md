@@ -94,7 +94,7 @@ mcp-client/
 In `weather_agent/agent.py`:
 
 ```python
-MCP_SERVER_URL = "http://localhost:8085/mcp"
+MCP_SERVER_URL = "http://127.0.0.1:8085/mcp"
 
 connection_params = StreamableHTTPConnectionParams(
     url=MCP_SERVER_URL,
@@ -103,7 +103,7 @@ connection_params = StreamableHTTPConnectionParams(
 
 root_agent = Agent(
     name="weather_agent",
-    model="gemini-2.5-flash",
+    model="gemini-3.6-flash",
     tools=[weather_tools],
 )
 ```

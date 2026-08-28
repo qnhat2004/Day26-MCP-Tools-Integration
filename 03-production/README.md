@@ -28,7 +28,7 @@ Server chạy qua **Streamable HTTP** thay vì stdio, kèm bearer token verifica
 ```bash
 # Terminal 1 — khởi động server
 python auth_server.py
-# Server lắng nghe tại http://localhost:8000/mcp
+# Server lắng nghe tại http://127.0.0.1:8000/mcp
 
 # Terminal 2 — client kết nối kèm token
 python auth_client.py
@@ -49,9 +49,11 @@ Client                                Server
   │◀── 401 Unauthorized ───────────────  │
 ```
 
+> **Lưu ý**: dùng `127.0.0.1` thay vì `localhost` trong client. Một số máy có proxy hệ thống (ví dụ squid) chặn `localhost` và gây lỗi 504 khi client kết nối, trong khi `127.0.0.1` đi thẳng tới server local.
+
 - Token hợp lệ → truy cập tool bình thường
 - Thiếu token → `401`
-- Token sai → `403`
+- Token sai / sai định dạng (thiếu prefix `Bearer`) → `401`
 - Logic tool không biết gì về auth — SDK xử lý ở tầng transport
 
 ---
