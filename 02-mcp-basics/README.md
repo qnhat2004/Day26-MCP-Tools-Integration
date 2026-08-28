@@ -53,6 +53,27 @@ call_tool get_weather(city='Haiphong'):
 | `get_weather(city)` | Thời tiết hiện tại của một thành phố | "Thời tiết Hà Nội thế nào?" |
 | `search_logs(keyword, limit)` | Tìm dòng log gần nhất chứa keyword — dữ liệu động từ `app.log` | "Tìm 5 lỗi gần nhất trong log" |
 
+## Công việc thực tế MCP Server giải quyết
+
+Server này giải quyết 2 việc thực tế cho một agent:
+
+1. **Tra cứu thời tiết** (`get_weather`) — agent cần trả lời câu hỏi thời tiết của người dùng thì gọi tool này thay vì đoán bừa.
+2. **Truy vết lỗi trong log** (`search_logs`) — agent hỗ trợ lập trình viên debug: đọc file `app.log` trên đĩa (dữ liệu ĐỘNG, không hard-code), lọc theo keyword, trả các dòng mới nhất. Đúng tình huống "Tìm 5 lỗi gần nhất trong log".
+
+## Input / Output từng tool
+
+### `get_weather(city)`
+| | |
+|---|---|
+| **Input** | `city: string` — tên thành phố (bắt buộc) |
+| **Output** | `string` — chuỗi mô tả thời tiết, ví dụ `"Hanoi: 29°C, trời mưa"` |
+
+### `search_logs(keyword, limit)`
+| | |
+|---|---|
+| **Input** | `keyword: string` — từ khoá lọc (mặc định `"ERROR"`) · `limit: int` — số dòng tối đa (mặc định `5`, tuỳ chọn) |
+| **Output** | `string` — các dòng log khớp, mới nhất lên đầu, hoặc thông báo không tìm thấy |
+
 ---
 
 ## MCP là gì? Giải thích đơn giản

@@ -56,6 +56,47 @@ Client                                Server
 - Token sai / sai định dạng (thiếu prefix `Bearer`) → `401`
 - Logic tool không biết gì về auth — SDK xử lý ở tầng transport
 
+### Test auth bằng lệnh (token đúng / sai / thiếu)
+
+Với server đang chạy, mở terminal thứ 2 và gửi request `initialize`:
+
+```bash
+# 1. TOKEN ĐÚNG → 200 OK (kèm session id)
+curl -i -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Authorization: Bearer dev-token-abc123" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
+
+# 2. TOKEN SAI → 401 Unauthorized
+curl -i -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Authorization: Bearer wrong-token" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
+
+# 3. THIẾU TOKEN → 401 Unauthorized
+curl -i -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
+
+# Lưu ý: header phải là "Authorization: Bearer <TOKEN>" — thiếu chữ "Bearer " cũng bị 401
+```
+
+Kết quả mong đợi:
+
+```
+# Token đúng
+HTTP/1.1 200 OK
+mcp-session-id: <uuid>
+# body chứa event: message + serverInfo
+
+# Token sai / thiếu
+HTTP/1.1 401 Unauthorized
+{"error": "invalid_token", "error_description": "Authentication required"}
+```
+
 ---
 
 ## 3b. Tool Registry & Discovery

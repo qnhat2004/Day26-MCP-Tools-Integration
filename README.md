@@ -38,7 +38,7 @@ cd 02-mcp-basics && python weather_client.py
 # Lưu ý Windows: dùng `python -X utf8 weather_client.py` nếu lỗi UnicodeEncodeError
 
 # Function Calling (cần Gemini API key)
-export GEMINI_API_KEY=...
+export GOOGLE_API_KEY=...
 cd 01-function-calling && python weather_function_calling.py
 
 # Production — Auth (2 terminal)
